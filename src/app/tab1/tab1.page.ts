@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { getLogger, LogEventSource } from '@obsidize/rx-console';
+import { LogManagerService } from '../services/log-manager.service';
 
 @Component({
   selector: 'app-tab1',
@@ -7,6 +9,15 @@ import { Component } from '@angular/core';
 })
 export class Tab1Page {
 
-  constructor() {}
+  private readonly logger: LogEventSource = getLogger('Tab1Page');
 
+  constructor(
+    private readonly logManager: LogManagerService
+  ) {
+  }
+
+  public async sendAppLogs(): Promise<void> {
+    this.logger.debug('sendAppLogs()');
+    await this.logManager.shareLogsViaEmail();
+  }
 }
