@@ -1,0 +1,7 @@
+{
+  "name": "ionic-native-file-logging-example",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
