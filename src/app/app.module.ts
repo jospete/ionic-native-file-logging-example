@@ -21,4 +21,5 @@ import { AppComponent } from './app.component';
     SocialSharing
   ],
 })
-export class AppModule { }
+export class AppModule {
+}

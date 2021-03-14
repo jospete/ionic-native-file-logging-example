@@ -1,11 +1,13 @@
 import { Injectable, OnDestroy } from '@angular/core';
+import { Platform } from '@ionic/angular';
 import { getLogger, LogEvent, LogEventSource, LogLevel, RxConsole } from '@obsidize/rx-console';
 import { CordovaFileEntryApi, RotatingFileStream } from '@obsidize/rotating-file-stream';
+import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { File as CordovaFile } from '@ionic-native/file/ngx';
-import { environment } from 'src/environments/environment';
-import { Platform } from '@ionic/angular';
 import { buffer, map, concatMap } from 'rxjs/operators';
 import { interval, Subscription } from 'rxjs';
+
+import { environment } from 'src/environments/environment';
 
 if (!environment.production) {
   RxConsole.main
@@ -26,7 +28,8 @@ export class LogManagerService implements OnDestroy {
 
   constructor(
     private readonly platform: Platform,
-    private readonly cdvFile: CordovaFile
+    private readonly cdvFile: CordovaFile,
+    private readonly socialSharing: SocialSharing
   ) {
 
     this.mFileStreamSub = new Subscription();
@@ -49,6 +52,21 @@ export class LogManagerService implements OnDestroy {
 
   private clearFileStreamSub(): void {
     if (this.mFileStreamSub) this.mFileStreamSub.unsubscribe();
+  }
+
+  public async shareLogsViaEmail(): Promise<void> {
+
+    this.logger.debug('shareLogsViaEmail()');
+    const logFilePaths = this.logFiles.map(file => file.toURL());
+
+    await this.socialSharing.shareViaEmail(
+      'New App Logs Attached',
+      '[' + environment.appId + '] App Logs',
+      [],
+      [],
+      [],
+      logFilePaths
+    );
   }
 
   public async initialize(): Promise<void> {
