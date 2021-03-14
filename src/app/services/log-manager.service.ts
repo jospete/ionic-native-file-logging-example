@@ -84,6 +84,7 @@ export class LogManagerService implements OnDestroy {
     this.mFileStreamSub = RxConsole.main.events.pipe(
 
       buffer(interval(5000)),
+      filter((events: LogEvent[]) => !!events && events.length > 0),
       map((events: LogEvent[]) => events.map((ev: LogEvent) => ev.toString()).join('\n')),
       filter((str: string) => !!str && str.length > 0),
       map((str: string) => new TextEncoder().encode(str).buffer),
