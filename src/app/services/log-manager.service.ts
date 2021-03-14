@@ -82,16 +82,30 @@ export class LogManagerService implements OnDestroy {
     this.clearFileStreamSub();
     this.mFileStreamSub = RxConsole.main.events.pipe(
 
+      // Accumulate log events for 5 seconds
       buffer(interval(5000)),
+
+      // Don't do anything if there are no new events
       filter((events: LogEvent[]) => !!events && events.length > 0),
-      map((events: LogEvent[]) => events.map((ev: LogEvent) => ev.toString()).join('\n')),
+
+      // Combine the buffered events to a string payload (need to tack on a newline at the end since join doesn't do that)
+      map((events: LogEvent[]) => events.map((ev: LogEvent) => ev.toString()).join('\n') + '\n'),
+
+      // If the string is somehow empty or falsy, skip it
       filter((str: string) => !!str && str.length > 0),
+
+      // Encode the string as an ArrayBuffer
       map((str: string) => new TextEncoder().encode(str).buffer),
 
+      // Write the encoded content to the RotatingFileStream instance.
+      // NOTE: the stream will handle file swapping in the background, so we don't have to handle that part directly.
       concatMap((fileData: ArrayBuffer) => this.fileStream.write(fileData).catch(e => {
         this.logger.fatal('log file write FATAL: ', e);
       }))
 
+      // Activate this subscription to start recieving events.
+      // NOTE: typically we would do event handling in the subscribe block,
+      // but we can only write to files one-at-a-time, so we put the actual subscribe logic in concatMap() instead.
     ).subscribe();
   }
 }
