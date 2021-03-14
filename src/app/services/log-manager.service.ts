@@ -23,7 +23,7 @@ export class LogManagerService implements OnDestroy {
 
   private readonly logger: LogEventSource = getLogger('LogManagerService');
   private readonly fileStream: RotatingFileStream<CordovaFileEntryApi>;
-  private readonly logFiles: CordovaFileEntryApi[];
+
   private mFileStreamSub: Subscription;
 
   constructor(
@@ -33,16 +33,13 @@ export class LogManagerService implements OnDestroy {
   ) {
 
     this.mFileStreamSub = new Subscription();
-
-    this.logFiles = CordovaFileEntryApi.createCacheRotationFiles(
-      cdvFile,
-      'logs',
-      ['debug-a.log', 'debug-b.log']
-    );
-
     this.fileStream = new RotatingFileStream({
       maxSize: 2000000, // 2MB
-      files: this.logFiles
+      files: CordovaFileEntryApi.createCacheRotationFiles(
+        cdvFile,
+        'logs',
+        ['debug-a.log', 'debug-b.log']
+      )
     });
   }
 
@@ -60,7 +57,9 @@ export class LogManagerService implements OnDestroy {
   public async shareLogsViaEmail(): Promise<void> {
 
     this.logger.debug('shareLogsViaEmail()');
-    const logFilePaths = this.logFiles.map(file => file.toURL());
+    const files = await this.fileStream.refreshAllEntries();
+    const logFilePaths = files.map(file => file.toURL());
+    this.logger.debug('opening email with file attachments: ', logFilePaths);
 
     await this.socialSharing.shareViaEmail(
       'New App Logs Attached',
