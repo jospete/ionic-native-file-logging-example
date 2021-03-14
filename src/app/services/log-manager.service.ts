@@ -1,6 +1,14 @@
 import { Injectable } from '@angular/core';
-import { getLogger, LogEventSource } from '@obsidize/rx-console';
+import { getLogger, LogEventSource, LogLevel, RxConsole } from '@obsidize/rx-console';
 import { File as CordovaFile } from '@ionic-native/file/ngx';
+import { environment } from 'src/environments/environment';
+
+if (!environment.production) {
+  RxConsole.main
+    .setLevel(LogLevel.TRACE)
+    .events
+    .subscribe(ev => ev.broadcastTo(console));
+}
 
 @Injectable({
   providedIn: 'root'
