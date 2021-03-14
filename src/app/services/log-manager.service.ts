@@ -4,7 +4,7 @@ import { getLogger, LogEvent, LogEventSource, LogLevel, RxConsole } from '@obsid
 import { CordovaFileEntryApi, RotatingFileStream } from '@obsidize/rotating-file-stream';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { File as CordovaFile } from '@ionic-native/file/ngx';
-import { buffer, map, concatMap } from 'rxjs/operators';
+import { buffer, map, concatMap, filter } from 'rxjs/operators';
 import { interval, Subscription } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
@@ -84,11 +84,9 @@ export class LogManagerService implements OnDestroy {
     this.mFileStreamSub = RxConsole.main.events.pipe(
 
       buffer(interval(5000)),
-
-      map((events: LogEvent[]) => {
-        const fileDataString = events.map((ev: LogEvent) => ev.toString()).join('\n');
-        return new TextEncoder().encode(fileDataString).buffer;
-      }),
+      map((events: LogEvent[]) => events.map((ev: LogEvent) => ev.toString()).join('\n')),
+      filter((str: string) => !!str && str.length > 0),
+      map((str: string) => new TextEncoder().encode(str).buffer),
 
       concatMap((fileData: ArrayBuffer) => this.fileStream.write(fileData).catch(e => {
         this.logger.fatal('log file write FATAL: ', e);
