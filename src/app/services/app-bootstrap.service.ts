@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { getLogger, LogEventSource } from '@obsidize/rx-console';
+import { environment } from 'src/environments/environment';
 import { LogManagerService } from './log-manager.service';
 
 @Injectable({
@@ -36,8 +37,15 @@ export class AppBootstrapService {
   }
 
   private async runInitializeActions(): Promise<void> {
+
     this.logger.debug('runInitializeActions()');
+
     await this.platform.ready();
     await this.logManager.initialize();
+
+    this.logger.debug('****************************** APP START ******************************');
+    this.logger.debug('  environment setup: ' + JSON.stringify(environment, null, '\t'));
+    // TODO: put other useful startup information here
+    this.logger.debug('***********************************************************************');
   }
 }

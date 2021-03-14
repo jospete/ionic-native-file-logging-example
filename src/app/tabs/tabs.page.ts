@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { getLogger, LogEventSource } from '@obsidize/rx-console';
 
 @Component({
   selector: 'app-tabs',
@@ -7,6 +8,12 @@ import { Component } from '@angular/core';
 })
 export class TabsPage {
 
-  constructor() {}
+  private readonly logger: LogEventSource = getLogger('TabsPage');
 
+  constructor() {
+  }
+
+  public onTabChange(tabIndex: number): void {
+    this.logger.info('onTabChange(): ' + tabIndex);
+  }
 }
