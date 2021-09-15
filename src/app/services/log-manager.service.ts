@@ -51,7 +51,7 @@ export class LogManagerService implements OnDestroy {
     // We don't really care if this doesn't work, since the only two ways this will explode are:
     // 1. there is no assigned subscription instance
     // 2. the subscription instance is already unsubscribed
-    try { this.mFileStreamSub.unsubscribe(); } catch (e) { }
+    try { this.mFileStreamSub.unsubscribe(); } catch (_) { }
   }
 
   public async shareLogsViaEmail(): Promise<void> {
