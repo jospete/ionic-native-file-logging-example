@@ -34,7 +34,7 @@ export class LogManagerService implements OnDestroy {
 
     this.mFileStreamSub = new Subscription();
     this.fileStream = new RotatingFileStream({
-      maxSize: 2000000, // 2MB
+      maxFileSize: 2000000, // 2MB
       files: CordovaFileEntryApi.createCacheRotationFiles(
         cdvFile,
         'logs',
