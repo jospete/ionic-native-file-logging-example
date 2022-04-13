@@ -21,25 +21,23 @@ if (!environment.production) {
 export class LogManagerService implements OnDestroy {
 
   private readonly logger = new Logger('LogManagerService');
-  private readonly fileStream: RotatingFileStream<CordovaFileEntryApi>;
 
-  private mFileStreamSub: Subscription;
+  private readonly fileStream: RotatingFileStream<CordovaFileEntryApi> = new RotatingFileStream({
+    maxFileSize: 2e6, // 2MB
+    files: CordovaFileEntryApi.createCacheRotationFiles(
+      this.cdvFile,
+      'logs',
+      ['debug-a.log', 'debug-b.log']
+    )
+  });
+
+  private mFileStreamSub: Subscription | undefined;
 
   constructor(
     private readonly platform: Platform,
     private readonly socialSharing: SocialSharing,
-    cdvFile: CordovaFile,
+    private readonly cdvFile: CordovaFile,
   ) {
-
-    this.mFileStreamSub = new Subscription();
-    this.fileStream = new RotatingFileStream({
-      maxFileSize: 2e6, // 2MB
-      files: CordovaFileEntryApi.createCacheRotationFiles(
-        cdvFile,
-        'logs',
-        ['debug-a.log', 'debug-b.log']
-      )
-    });
   }
 
   public ngOnDestroy(): void {
@@ -50,7 +48,7 @@ export class LogManagerService implements OnDestroy {
     // We don't really care if this doesn't work, since the only two ways this will explode are:
     // 1. there is no assigned subscription instance
     // 2. the subscription instance is already unsubscribed
-    try { this.mFileStreamSub.unsubscribe(); } catch { }
+    try { this.mFileStreamSub?.unsubscribe(); } catch { }
   }
 
   public async shareLogsViaEmail(): Promise<void> {
@@ -76,7 +74,7 @@ export class LogManagerService implements OnDestroy {
     }
 
     this.clearFileStreamSub();
-    
+
     this.mFileStreamSub = RxConsole
       .main
       .asObservable<Observable<LogEvent>>(fromEventPattern)
