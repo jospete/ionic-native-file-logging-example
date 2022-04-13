@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { getLogger, LogEventSource } from '@obsidize/rx-console';
+import { Logger } from '@obsidize/rx-console';
 import { LogManagerService } from '../services/log-manager.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { LogManagerService } from '../services/log-manager.service';
 })
 export class Tab1Page {
 
-  private readonly logger: LogEventSource = getLogger('Tab1Page');
+  private readonly logger = new Logger('Tab1Page');
 
   constructor(
     private readonly logManager: LogManagerService

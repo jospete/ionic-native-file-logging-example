@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { getLogger, LogEventSource } from '@obsidize/rx-console';
+import { Logger } from '@obsidize/rx-console';
 
 @Component({
   selector: 'app-tabs',
@@ -8,7 +8,7 @@ import { getLogger, LogEventSource } from '@obsidize/rx-console';
 })
 export class TabsPage {
 
-  private readonly logger: LogEventSource = getLogger('TabsPage');
+  private readonly logger = new Logger('TabsPage');
 
   constructor() {
   }

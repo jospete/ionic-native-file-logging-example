@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { getLogger, LogEventSource } from '@obsidize/rx-console';
+import { Logger } from '@obsidize/rx-console';
 import { environment } from 'src/environments/environment';
 import { LogManagerService } from './log-manager.service';
 
@@ -11,7 +11,7 @@ export class AppBootstrapService {
 
   public static readonly ERR_INIT_ALREADY_STARTED: string = 'AppBootstrapService_ERR_INIT_ALREADY_STARTED';
 
-  private readonly logger: LogEventSource = getLogger('AppBootstrapService');
+  private readonly logger = new Logger('AppBootstrapService');
   private mDidStartInitialize: boolean = false;
 
   constructor(

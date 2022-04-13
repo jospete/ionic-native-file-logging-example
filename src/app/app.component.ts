@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { getLogger, LogEventSource } from '@obsidize/rx-console';
+import { Logger } from '@obsidize/rx-console';
 import { AppBootstrapService } from './services/app-bootstrap.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { AppBootstrapService } from './services/app-bootstrap.service';
 })
 export class AppComponent {
 
-  private readonly logger: LogEventSource = getLogger('AppComponent');
+  private readonly logger = new Logger('AppComponent');
 
   constructor(
     private readonly appBootstrap: AppBootstrapService
