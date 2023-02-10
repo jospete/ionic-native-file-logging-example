@@ -4,7 +4,7 @@
   "description": "An example mobile app project to demonstrate native file logging.",
   "scripts": {
     "ng": "ng",
-    "start": "ionic serve -l",
+    "start": "ng serve --host=0.0.0.0 --port=8100",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
