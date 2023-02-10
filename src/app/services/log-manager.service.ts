@@ -14,6 +14,10 @@ getPrimaryLoggerTransport()
   .setFilter(ev => ev.level >= targetLogLevel)
   .setDefaultBroadcastEnabled(!environment.production);
 
+function compareLastModifiedTime(a: CordovaFileEntryApi, b: CordovaFileEntryApi): number {
+  return a.getLastModificationTime() - b.getLastModificationTime();
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -50,6 +54,7 @@ export class LogManagerService implements OnDestroy {
     try { this.mFileStreamSub?.unsubscribe(); } catch { }
   }
 
+  // Example for sharing log files via the share plugin
   public async shareLogsViaEmail(): Promise<void> {
 
     this.logger.debug('shareLogsViaEmail()');
@@ -62,6 +67,23 @@ export class LogManagerService implements OnDestroy {
       '[' + environment.appId + '] App Logs',
       logFilePaths
     );
+  }
+
+  // Example for smashing log files together to be uploaded somewhere
+  public async combineLogs(): Promise<string> {
+
+    this.logger.debug('combineLogs()');
+    const files = (await this.fileStream.refreshAllEntries()).sort(compareLastModifiedTime);
+    let result = '';
+
+    for (const file of files) {
+      const buffer = await file.read();
+      const text = new TextDecoder().decode(buffer);
+      result += `\n__FILE_BREAK__---------- ${file.getFileName()} ----------__FILE_BREAK__\n`;
+      result += text;
+    }
+
+    return result;
   }
 
   public async initialize(): Promise<void> {
