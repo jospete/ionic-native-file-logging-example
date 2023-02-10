@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { LogEvent, Logger, LogLevel, getPrimaryLoggerTransport } from '@obsidize/rx-console';
+import { LogEvent, Logger, LogLevel, getPrimaryLoggerTransport, stringifyLogEvent } from '@obsidize/rx-console';
 import { CordovaFileEntryApi, RotatingFileStream } from '@obsidize/rotating-file-stream';
 import { SocialSharing } from '@awesome-cordova-plugins/social-sharing/ngx';
 import { File as CordovaFile } from '@awesome-cordova-plugins/file/ngx';
@@ -123,7 +123,7 @@ export class LogManagerService implements OnDestroy {
 
     // Combine the buffered events to a string payload
     // (need to tack on a newline at the end since join doesn't do that)
-    const outputText = `${events.map((ev: LogEvent) => ev.toString()).join('\n')}\n`;
+    const outputText = `${events.map(stringifyLogEvent).join('\n')}\n`;
 
     // Encode the string as an ArrayBuffer
     const outputBuffer = new TextEncoder().encode(outputText).buffer;
