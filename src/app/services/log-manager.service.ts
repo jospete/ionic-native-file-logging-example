@@ -1,19 +1,18 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { LogEvent, Logger, LogLevel, RxConsole } from '@obsidize/rx-console';
+import { LogEvent, Logger, LogLevel, getPrimaryLoggerTransport } from '@obsidize/rx-console';
 import { CordovaFileEntryApi, RotatingFileStream } from '@obsidize/rotating-file-stream';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { File as CordovaFile } from '@ionic-native/file/ngx';
 import { buffer, concatMap } from 'rxjs/operators';
 import { fromEventPattern, interval, Observable, Subscription } from 'rxjs';
-
 import { environment } from 'src/environments/environment';
 
-if (!environment.production) {
-  RxConsole.main
-    .setLevel(LogLevel.TRACE)
-    .enableDefaultBroadcast();
-}
+const targetLogLevel = environment.production ? LogLevel.DEBUG : LogLevel.VERBOSE;
+
+getPrimaryLoggerTransport()
+  .setFilter(ev => ev.level >= targetLogLevel)
+  .setDefaultBroadcastEnabled(!environment.production);
 
 @Injectable({
   providedIn: 'root'
@@ -75,8 +74,8 @@ export class LogManagerService implements OnDestroy {
 
     this.clearFileStreamSub();
 
-    this.mFileStreamSub = RxConsole
-      .main
+    this.mFileStreamSub = getPrimaryLoggerTransport()
+      .events()
       .asObservable<Observable<LogEvent>>(fromEventPattern)
       .pipe(
 
