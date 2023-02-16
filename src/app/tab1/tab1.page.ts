@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewContainerRef } from '@angular/core';
 import { Logger } from '@obsidize/rx-console';
+import { tap } from 'rxjs/operators';
+import { ionViewWillEnter } from 'src/globals/ion-page-events';
 import { LogManagerService } from '../services/log-manager.service';
 
 @Component({
@@ -11,7 +13,12 @@ export class Tab1Page {
 
   private readonly logger = new Logger('Tab1Page');
 
+  public readonly pageWillEnter$ = ionViewWillEnter(this.containerRef).pipe(
+    tap(ev => this.logger.debug('page enter', ev))
+  );
+
   constructor(
+    private readonly containerRef: ViewContainerRef,
     private readonly logManager: LogManagerService
   ) {
   }
