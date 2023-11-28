@@ -1,0 +1,15 @@
+platforms:
+  android:
+    gradle:
+      - file: variables.gradle
+        target:
+          ext:
+            compileSdkVersion:
+        replace:
+          compileSdkVersion: 33
+      - file: variables.gradle
+        target:
+          ext:
+            targetSdkVersion:
+        replace:
+          targetSdkVersion: 33

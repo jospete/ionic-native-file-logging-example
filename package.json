@@ -5,6 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host=0.0.0.0 --port=8100",
+    "trap": "trapeze run trapeze.yaml -y --android-project android",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -45,6 +46,7 @@
     "@capacitor/cli": "4.6.3",
     "@ionic/angular-toolkit": "^7.0.0",
     "@ionic/lab": "3.2.10",
+    "@trapezedev/configure": "7.0.10",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
