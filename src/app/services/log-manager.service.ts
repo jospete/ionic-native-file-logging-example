@@ -60,7 +60,9 @@ export class LogManagerService {
       filesPaths
     );
 
-    await this.deleteTempLogFile();
+    if (environment.production) {
+      await this.deleteTempLogFile();
+    }
   }
 
   private async deleteTempLogFile(): Promise<void> {
@@ -72,13 +74,13 @@ export class LogManagerService {
 
   private async saveTempLogFile(): Promise<string> {
 
-    const dataBytes = await SecureLogger.getCacheBlob();
-    const dataBlob = new Blob([dataBytes]);
+    const dataBuffer = await SecureLogger.getCacheBlob();
+    const data = new TextDecoder().decode(dataBuffer);
 
     await Filesystem.writeFile({
       directory: Directory.Cache,
       path: tempLogFileName,
-      data: dataBlob,
+      data: data,
       encoding: Encoding.UTF8,
     });
 
