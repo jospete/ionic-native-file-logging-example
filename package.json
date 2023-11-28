@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host=0.0.0.0 --port=8100",
-    "trap": "trapeze run trapeze.yaml -y --android-project android",
+    "trap": "trapeze run trapeze.yaml -y --android-project android --ios-project ios/App",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",

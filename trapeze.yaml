@@ -13,3 +13,11 @@ platforms:
             targetSdkVersion:
         replace:
           targetSdkVersion: 33
+  ios:
+    targets:
+      App:
+        plist:
+          - replace: false
+            entries:
+              - NSPhotoLibraryUsageDescription: need photo pls
+              - NSPhotoLibraryAddUsageDescription: want add foto
