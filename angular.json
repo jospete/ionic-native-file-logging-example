@@ -39,7 +39,11 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "allowedCommonJsDependencies": [
+              "cordova-plugin-secure-logger",
+              "cordova-plugin-secure-logger/www/rx-console"
+            ]
           },
           "configurations": {
             "production": {

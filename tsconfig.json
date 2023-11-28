@@ -11,6 +11,8 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "target": "ES2022",
     "module": "es2020",
     "lib": [

@@ -1,135 +1,92 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
-import { LogEvent, Logger, LogLevel, getPrimaryLoggerTransport, stringifyLogEvent } from '@obsidize/rx-console';
-import { CordovaFileEntryApi, RotatingFileStream } from '@obsidize/rotating-file-stream';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { Logger, LogLevel, getPrimaryLoggerTransport } from '@obsidize/rx-console';
+import { sendRxConsoleEventToNative } from 'cordova-plugin-secure-logger/www/rx-console';
 import { SocialSharing } from '@awesome-cordova-plugins/social-sharing/ngx';
-import { File as CordovaFile } from '@awesome-cordova-plugins/file/ngx';
-import { buffer, concatMap } from 'rxjs/operators';
-import { fromEventPattern, interval, Observable, Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { SecureLogger } from 'cordova-plugin-secure-logger';
 
+const primaryTransport = getPrimaryLoggerTransport();
 const targetLogLevel = environment.production ? LogLevel.DEBUG : LogLevel.VERBOSE;
+const tempLogFileName = `app.log`;
 
-getPrimaryLoggerTransport()
+primaryTransport
   .setFilter(ev => ev.level >= targetLogLevel)
-  .setDefaultBroadcastEnabled(!environment.production);
-
-function compareLastModifiedTime(a: CordovaFileEntryApi, b: CordovaFileEntryApi): number {
-  return a.getLastModificationTime() - b.getLastModificationTime();
-}
+  .setDefaultBroadcastEnabled(!environment.production)
+  .events()
+  .addListener(sendRxConsoleEventToNative);
 
 @Injectable({
   providedIn: 'root'
 })
-export class LogManagerService implements OnDestroy {
+export class LogManagerService {
 
   private readonly logger = new Logger('LogManagerService');
-
-  private readonly fileStream: RotatingFileStream<CordovaFileEntryApi> = new RotatingFileStream({
-    maxFileSize: 2e6, // 2MB
-    files: CordovaFileEntryApi.createCacheRotationFiles(
-      this.cdvFile,
-      'logs',
-      ['debug-a.log', 'debug-b.log']
-    )
-  });
-
-  private mFileStreamSub: Subscription | undefined;
 
   constructor(
     private readonly platform: Platform,
     private readonly socialSharing: SocialSharing,
-    private readonly cdvFile: CordovaFile,
   ) {
   }
 
-  public ngOnDestroy(): void {
-    this.clearFileStreamSub();
-  }
-
-  private clearFileStreamSub(): void {
-    // We don't really care if this doesn't work, since the only two ways this will explode are:
-    // 1. there is no assigned subscription instance
-    // 2. the subscription instance is already unsubscribed
-    try { this.mFileStreamSub?.unsubscribe(); } catch { }
-  }
-
-  // Example for sharing log files via the share plugin
-  public async shareLogsViaEmail(): Promise<void> {
-
-    this.logger.debug('shareLogsViaEmail()');
-    const files = await this.fileStream.refreshAllEntries();
-    const logFilePaths = files.map(file => file.toURL());
-    this.logger.debug('opening email with file attachments: ', logFilePaths);
-
-    await this.socialSharing.share(
-      'New App Logs Attached',
-      '[' + environment.appId + '] App Logs',
-      logFilePaths
-    );
-  }
-
-  // Example for smashing log files together to be uploaded somewhere
-  public async combineLogs(): Promise<string> {
-
-    this.logger.debug('combineLogs()');
-    const files = (await this.fileStream.refreshAllEntries()).sort(compareLastModifiedTime);
-    let result = '';
-
-    for (const file of files) {
-      const buffer = await file.read();
-      const text = new TextDecoder().decode(buffer);
-      result += `\n__FILE_BREAK__---------- ${file.getFileName()} ----------__FILE_BREAK__\n`;
-      result += text;
-    }
-
-    return result;
+  private get isNativePlatform(): boolean {
+    return this.platform.is('cordova')
+      || this.platform.is('capacitor');
   }
 
   public async initialize(): Promise<void> {
 
     this.logger.debug('initialize()');
 
-    if (!this.platform.is('cordova')) {
-      return;
+    if (!this.isNativePlatform) {
+      this.logger.info(`removing native proxy (non-native-platform)`);
+      primaryTransport.events().removeListener(sendRxConsoleEventToNative);
+      SecureLogger.clearEventCacheFlushInterval();
     }
-
-    this.clearFileStreamSub();
-
-    this.mFileStreamSub = getPrimaryLoggerTransport()
-      .events()
-      .asObservable<Observable<LogEvent>>(fromEventPattern)
-      .pipe(
-
-        // Accumulate log events for 5 seconds
-        buffer(interval(5000)),
-
-        // NOTE: typically we would do event handling in the subscribe block,
-        // but we can only write to files one-at-a-time, so we put the actual subscribe logic in concatMap() instead.
-        concatMap(events => this.saveLogEvents(events).catch(e => {
-          this.logger.fatal('log file write FATAL: ', e);
-        }))
-
-        // Activate this subscription to start recieving events.
-      ).subscribe();
   }
 
-  private async saveLogEvents(events: LogEvent[]): Promise<void> {
+  // Example for sharing log files via the share plugin
+  public async shareLogsViaEmail(): Promise<void> {
 
-    // Don't do anything if there are no new events
-    if (!events || events.length <= 0) {
-      return;
-    }
+    this.logger.debug('shareLogsViaEmail()');
+    const filePath = await this.saveTempLogFile();
+    const filesPaths = [filePath];
+    this.logger.debug('opening email with file attachments: ', filesPaths);
 
-    // Combine the buffered events to a string payload
-    // (need to tack on a newline at the end since join doesn't do that)
-    const outputText = `${events.map(stringifyLogEvent).join('\n')}\n`;
+    await this.socialSharing.share(
+      'New App Logs Attached',
+      '[' + environment.appId + '] App Logs',
+      filesPaths
+    );
 
-    // Encode the string as an ArrayBuffer
-    const outputBuffer = new TextEncoder().encode(outputText).buffer;
+    await this.deleteTempLogFile();
+  }
 
-    // Write the encoded content to the RotatingFileStream instance.
-    // NOTE: the stream will handle file swapping in the background, so we don't have to handle that part directly.
-    await this.fileStream.write(outputBuffer);
+  private async deleteTempLogFile(): Promise<void> {
+    await Filesystem.deleteFile({
+      directory: Directory.Cache,
+      path: tempLogFileName,
+    });
+  }
+
+  private async saveTempLogFile(): Promise<string> {
+
+    const dataBytes = await SecureLogger.getCacheBlob();
+    const dataBlob = new Blob([dataBytes]);
+
+    await Filesystem.writeFile({
+      directory: Directory.Cache,
+      path: tempLogFileName,
+      data: dataBlob,
+      encoding: Encoding.UTF8,
+    });
+
+    const { uri } = await Filesystem.getUri({
+      directory: Directory.Cache,
+      path: tempLogFileName,
+    });
+
+    return uri;
   }
 }
