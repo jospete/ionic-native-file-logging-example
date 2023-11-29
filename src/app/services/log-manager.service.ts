@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Logger, LogLevel, getPrimaryLoggerTransport } from '@obsidize/rx-console';
-import { sendRxConsoleEventToNative } from 'cordova-plugin-secure-logger/www/rx-console';
 import { SocialSharing } from '@awesome-cordova-plugins/social-sharing/ngx';
 import { environment } from 'src/environments/environment';
 import { SecureLogger } from 'cordova-plugin-secure-logger';
@@ -15,7 +14,7 @@ primaryTransport
   .setFilter(ev => ev.level >= targetLogLevel)
   .setDefaultBroadcastEnabled(!environment.production)
   .events()
-  .addListener(sendRxConsoleEventToNative);
+  .addListener(SecureLogger.webviewEventListenerProxy);
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +40,7 @@ export class LogManagerService {
 
     if (!this.isNativePlatform) {
       this.logger.info(`removing native proxy (non-native-platform)`);
-      primaryTransport.events().removeListener(sendRxConsoleEventToNative);
+      primaryTransport.events().removeListener(SecureLogger.webviewEventListenerProxy);
       SecureLogger.clearEventCacheFlushInterval();
     }
   }
