@@ -39,7 +39,7 @@ export class LogManagerService {
 
     if (!this.isNativePlatform) {
       this.logger.info(`removing native proxy (non-native-platform)`);
-      primaryTransport.events().removeListener(sendRxConsoleEventToNative);
+      primaryTransport.removeListener(sendRxConsoleEventToNative);
       SecureLogger.clearEventCacheFlushInterval();
     }
   }
