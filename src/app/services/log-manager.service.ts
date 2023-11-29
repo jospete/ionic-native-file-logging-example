@@ -4,7 +4,7 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Logger, LogLevel, getPrimaryLoggerTransport } from '@obsidize/rx-console';
 import { SocialSharing } from '@awesome-cordova-plugins/social-sharing/ngx';
 import { environment } from 'src/environments/environment';
-import { SecureLogger, sendRxConsoleEventToNative } from 'cordova-plugin-secure-logger';
+import { SecureLogger, disableWebviewToNative, enableWebviewListener } from 'cordova-plugin-secure-logger';
 
 const primaryTransport = getPrimaryLoggerTransport();
 const targetLogLevel = environment.production ? LogLevel.DEBUG : LogLevel.VERBOSE;
@@ -12,8 +12,9 @@ const tempLogFileName = `app.log`;
 
 primaryTransport
   .setFilter(ev => ev.level >= targetLogLevel)
-  .setDefaultBroadcastEnabled(!environment.production)
-  .addListener(sendRxConsoleEventToNative);
+  .setDefaultBroadcastEnabled(!environment.production);
+
+enableWebviewListener();
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +40,7 @@ export class LogManagerService {
 
     if (!this.isNativePlatform) {
       this.logger.info(`removing native proxy (non-native-platform)`);
-      primaryTransport.removeListener(sendRxConsoleEventToNative);
-      SecureLogger.clearEventCacheFlushInterval();
+      disableWebviewToNative();
     }
   }
 
