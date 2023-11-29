@@ -13,7 +13,6 @@ const tempLogFileName = `app.log`;
 primaryTransport
   .setFilter(ev => ev.level >= targetLogLevel)
   .setDefaultBroadcastEnabled(!environment.production)
-  .events()
   .addListener(sendRxConsoleEventToNative);
 
 @Injectable({
