@@ -11,3 +11,15 @@ implementation for relevant details.
 **NOTE**: This project uses the social sharing plugin for example purposes to be able to extract
 the log data locally. **This is for demonstration purposes only.** Logs should be uploaded
 to a secure server in most production use cases to avoid bleeding out sensitive user data.
+
+# Building This Project
+
+```bash
+git clone https://github.com/jospete/ionic-native-file-logging-example.git
+cd ionic-native-file-logging-example
+nvm use
+npm install
+npm run init
+npx cap open android
+# OR: npx cap open ios
+```
