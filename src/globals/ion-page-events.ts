@@ -16,8 +16,8 @@ export function ionViewDidEnter(ref: ViewContainerRef): Observable<any> {
   return fromContainerEvent(ref, 'ionViewDidEnter');
 }
 
-export function ionViewWillLEave(ref: ViewContainerRef): Observable<any> {
-  return fromContainerEvent(ref, 'ionViewWillLEave');
+export function ionViewWillLeave(ref: ViewContainerRef): Observable<any> {
+  return fromContainerEvent(ref, 'ionViewWillLeave');
 }
 
 export function ionViewDidLeave(ref: ViewContainerRef): Observable<any> {
