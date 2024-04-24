@@ -14,7 +14,7 @@ primaryTransport
   .setFilter(ev => ev.level >= targetLogLevel)
   .setDefaultBroadcastEnabled(!environment.production);
 
-enableWebviewListener();
+enableWebviewListener(primaryTransport);
 
 @Injectable({
   providedIn: 'root'
