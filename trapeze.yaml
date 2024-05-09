@@ -6,13 +6,13 @@ platforms:
           ext:
             compileSdkVersion:
         replace:
-          compileSdkVersion: 33
+          compileSdkVersion: 34
       - file: variables.gradle
         target:
           ext:
             targetSdkVersion:
         replace:
-          targetSdkVersion: 33
+          targetSdkVersion: 34
   ios:
     targets:
       App:
