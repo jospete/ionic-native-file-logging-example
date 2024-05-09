@@ -19,7 +19,7 @@ git clone https://github.com/jospete/ionic-native-file-logging-example.git
 cd ionic-native-file-logging-example
 nvm use
 npm install
-npm run init
+npm run app:init
 npx cap open android
 # OR: npx cap open ios
 ```

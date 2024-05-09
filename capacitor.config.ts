@@ -7,6 +7,12 @@ const config: CapacitorConfig = {
   appName: 'capacitor-testapp',
   webDir: 'www',
   bundledWebRuntime: false,
+  android: {
+    path: 'platforms/android'
+  },
+  ios: {
+    path: 'platforms/ios'
+  },
   plugins: {
     CapacitorCookies: {
       enabled: true,
