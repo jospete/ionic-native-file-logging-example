@@ -4,7 +4,7 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Logger, LogLevel, getPrimaryLoggerTransport } from '@obsidize/rx-console';
 import { SocialSharing } from '@awesome-cordova-plugins/social-sharing/ngx';
 import { environment } from 'src/environments/environment';
-import { SecureLogger, disableWebviewToNative, enableWebviewListener } from 'cordova-plugin-secure-logger';
+import { SecureLogger, disableWebviewListener, enableWebviewListener } from 'cordova-plugin-secure-logger';
 
 const primaryTransport = getPrimaryLoggerTransport();
 const targetLogLevel = environment.production ? LogLevel.DEBUG : LogLevel.VERBOSE;
@@ -40,7 +40,7 @@ export class LogManagerService {
 
     if (!this.isNativePlatform) {
       this.logger.info(`removing native proxy (non-native-platform)`);
-      disableWebviewToNative();
+      disableWebviewListener();
     }
   }
 
