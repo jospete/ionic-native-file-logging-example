@@ -6,7 +6,6 @@ const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
   appName: 'capacitor-testapp',
   webDir: 'www',
-  bundledWebRuntime: false,
   android: {
     path: 'platforms/android'
   },
