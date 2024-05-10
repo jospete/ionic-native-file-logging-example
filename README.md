@@ -16,7 +16,9 @@ to a secure server in most production use cases to avoid bleeding out sensitive 
 
 ### Prerequisites
 
-NVM must be installed and available on command line
+1. [Git](https://git-scm.com/downloads) must be installed and available on command line
+
+2. NVM must be installed and available on command line
 
 - [nvm for mac](https://github.com/coreybutler/nvm-windows)
 - [nvm for windows](https://github.com/coreybutler/nvm-windows)
