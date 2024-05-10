@@ -14,12 +14,38 @@ to a secure server in most production use cases to avoid bleeding out sensitive 
 
 # Building This Project
 
+### Prerequisites
+
+NVM must be installed and available on command line
+
+- [nvm for mac](https://github.com/coreybutler/nvm-windows)
+- [nvm for windows](https://github.com/coreybutler/nvm-windows)
+
+### Build Steps
+
 ```bash
+# clone this repo
 git clone https://github.com/jospete/ionic-native-file-logging-example.git
+
+# cd into the fresh clone folder
 cd ionic-native-file-logging-example
+
+# make sure you're using the correct node version via nvm
 nvm use
+
+# if nvm gives a "version not found" error
+# nvm install 18
+# nvm use
+
+# install project dependencies
 npm install
+
+# initialize project artificats
 npm run app:init
+
+# open android project to run it
 npx cap open android
-# OR: npx cap open ios
+
+# or open ios project
+# npx cap open ios
 ```

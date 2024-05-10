@@ -40,7 +40,7 @@ export class LogManagerService {
 
     if (!this.isNativePlatform) {
       this.logger.info(`removing native proxy (non-native-platform)`);
-      disableWebviewListener();
+      disableWebviewListener(primaryTransport);
     }
   }
 
