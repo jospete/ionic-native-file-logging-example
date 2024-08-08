@@ -35,7 +35,7 @@
     "@ionic/angular": "6.5.3",
     "@ionic/core": "6.5.3",
     "@obsidize/rx-console": "6.2.1",
-    "cordova-plugin-secure-logger": "1.4.16",
+    "cordova-plugin-secure-logger": "1.4.17",
     "cordova-plugin-x-socialsharing": "6.0.4",
     "es6-promise-plugin": "^4.2.2",
     "rxjs": "7.8.1",
